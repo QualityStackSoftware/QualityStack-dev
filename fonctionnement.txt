@@ -1,0 +1,234 @@
+Structure en local de QualityDock
+---------------------------------
+Il faut definir une structure simple 
+
+QualityDock / 
+	authentication.git / 
+	application.git / 
+		[ignore] qualityDock.conf [crypté]
+	
+	qualitydock.exe
+	<projectA> / 
+	<projectB> / 
+	
+		
+	
+
+Définition d'un UIID unique
+---------------------------
+basé sur :
+- les données utilisateurs (variable)
+- la taille du dépot_auth (variable au cous du temps - unique)
+- le temps de téléchargement du dépot authentication (variable)
+- le temps de téléchargement du dépot application (variable)
+- l'addresse du thread calculant le UIID (variable)
+
+non basé sur:
+- les données PC ou d'environnement
+	
+
+Processus lors de l'installation
+--------------------------------
+
+1. Téléchargement de Installer
+2. Lancement de Installer
+
+	Sélectionner un répertoire d'installation : <path>/QualityDock
+	Analyse du répertoire: application existante (update) ou (installation)
+	install: Téléchargement du dépot authentication
+	install: Saisie des données utilisateurs: Nom/Prénom/Email
+	Calcul d'un UUID unique pour l'application
+	
+	Génération du fichier de licence qualityDock.conf contenant notamment le path sous dépot_auth
+	Ce fichier est crypté et n'est lisible que par l'application
+	{
+		key: <key> // cette clef permet de lire les données stockées dans depot_auth, de l'utilisateur
+		path: <path> // ce chemin définit le lieu de stockage pour l'utilisateur
+	}
+	La clef <key> permet de décrypter les informations de validité écrite dans le dépot d'authentification
+	
+	Génération du fichier de licence online, stocké dans le répertoire depot_authentication
+	Génération du fichier de licence offline, stocké dans le répertoire depot_authentication
+	
+	Commit/push de ces données sous dépot_auth
+	
+	Téléchargement du dépot application.git
+
+3. fin de lancement de l'installation
+
+
+Gestion des updates
+-------------------
+
+L'application QualityDock definit 2 versions: passive et active.
+lors de l'arrivée d'une nouvelle mise à jour, l'application est soit en cours d'execution, soit non lancée.
+La mise à jour se déroule ainsi: 
+- si l'application est non lancée, alors lors de son lancement, elle regarde si elle doit s'updater. Si c'est le cas, alors elle checkout/pull le depot de [depot_app]
+et elle utilise la dernière version.
+- si l'application est lancée, alors elle détecte une mise à jour, elle indique la mise à jour et lit le temps maximal pour repousser la mise à jour. Au final, soit l'utilisateur remet à plus tard la mise à jour et l'installation sera au redémarrage, soit il redémarrage explicitement.
+
+
+Usurpation d'identité
+---------------------
+
+Usurpation d'identité: On ne peut pas recevoir de commits marqués par un utilisateur identique à soi-même.
+Lors d'un rebase, le code vérifie que les nouveaux commits ne sont pas identifiés à sa nom. Si c'est le cas, l'application 
+détecte une usurpation d'identité.
+	
+L'application, lors de son lancement, connait son utilisateur "depuis un commit de référence".
+"I am user1 until commit_ref"
+Lors de son lancemant, elle fait un rebase, et à partir de ce commit, user1 est identifié.
+-> à partir de ce commit, user1 existe.
+
+Si des commits de user1 sont apparus lors du rebase, alors il y a plusieurs possibilités:
+- ces commits ont été réalisés par moi-même lors d'une session précedente, en utilisant un autre dépot local (instal sur un autre PC notanment)
+- ces commits proviennent peut être d'une usurpation d'identité qui est en cours de session. A ce moment, je ne peut pas statuer.
+
+Ce sera lorsque je réaliserais un push, que l'usurpation (potentiel) d'identité sera détecté.
+	
+Gestion du mode OffLine
+-----------------------
+
+Ce mode est préparé à l'avance, en mode online.
+rebase sur depot_auth [obligatoire]
+rebase sur depot_app [optionel]
+
+pour marquer le mode offline, on commit l'info suivante dans chaque dépot de projet:
+
+mode/sha0.txt
+     sha0/sha1.txt
+
+on écrit dans depot_auth de l'utilisateur un fichier sha0.txt vide indiquant la presence offline
+		
+sh0.txt
+{
+	mode: offline
+	commit_parent: <commit>
+	stop_date: 25
+}
+
+sha1.txt
+{
+	remaining_date: 2212 hours
+	all_commit: [
+					<commit1> //
+					<commit2>
+					...
+				]
+}
+
+
+
+Mode OFFLINE
+
+	Initilisé en mode ONLINE.
+	En mode ONLINE, on met à jour les dépots (depot_app, depot_auth).
+	Dans le dépot depot_app on crée un répertoire unique pour l'utilisateur:
+		lié à son UUID
+		lié au commit courant  ( enregistré dans dépot_auth )
+	Ce répertoire sera accessible uniquement par l'application et par l'utilisateur
+	
+	Dans dépot_auth, on enregistre une donnée cryptée par l'application et l'utilisateur
+	permettant 
+	
+	En mode OFFLINE, on engistre les commits dans le répertoire prédéfini pour l'utilisateur. Seul l'utilisateur peut écrire dedans: le répertoire 
+	
+	
+	en mode online, on met à jour les depots: 
+		rebase sur le dépot depot_app
+		on note dans depot_auth les infos nécessaires pour resynchroniser le depot depot_app
+	
+	
+	[
+		dans le mode offline, on crée des commits metiers qui cotiennent un time-offset qui rendra leur poussage sur le depot_project impossible plus tard (perte de synchronisation. On pourra les pousser uniquement si on pousse aussi sur le dépot_auth, les infos de resynchronisation nécéssaires couplées aux infos de gestion du mode offline  
+
+		peut on avoir plusieurs commit: oui, il n'y a pas de modification de gestion des 
+		commits entre les modes 
+		]
+	
+		
+	[
+		les commits réalisés en mode offline possèdent 
+			un time-offset et la date du premier commit réalisé en offline
+				-> si le time-offset dépasse le temps alloué par la licence offline, alors on n'ecrit pas le commit. Par ailleurs , on n'arrivera pas dans ce cas car l'application arretera de travailler car la licence est dépassé.
+				
+		dans le depot depot_auth
+		jjmmyyyyhhMMss
+		22-11-2015 9h48m01s sha01
+		22-11-201510h34m37s sha02
+		22-11-201510h34m37s sha03
+		
+		la licence en mode offline est définie à partir d'un commit donné: ce nom de commit est enregistré dans depot_auth et pushed.
+		
+		c'est le commit parent du commit "offline" qui va être crée lors de la période offline
+		
+		en mode offline, on ne créé qu'un seul commit
+	]
+	
+	
+	si pas de connexion : on est en offline
+		alors pas d'update des dépots (app, auth, project)
+		tous les commits sont 
+	
+
+liste des widgets à réaliser
+----------------------------
+
+
+- mise à jour
+- dashboard (liste projet, ...) / homepage
+- collection d'objet
+- vue detaillée d'un objet
+- configuration de l'application
+- notification (gmail like)
+- widget permettant de rajouter des commentaires sur un type d'objet donné
+- 
+
+widget fonctionnels
+- import de données
+- analyse de données
+- integration Jenkins
+	
+	
+	
+
+
+	
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

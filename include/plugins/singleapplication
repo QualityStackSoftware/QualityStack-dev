@@ -1,0 +1,2 @@
+#include "../../plugins/singleapplication/singleapplication.h"
+#include "../../plugins/singleapplication/oncerunchecker.h"

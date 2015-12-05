@@ -1,0 +1,15 @@
+﻿#ifndef GLOBAL_H
+#define GLOBAL_H
+
+#include <qglobal.h>
+
+#include <QApplication>
+#include <QObject>
+#include <QDebug>
+#include <QWindow>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
+#include <Qmap>
+#include <QMainWindow>
+
+#endif // GLOBAL_H
