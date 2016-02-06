@@ -15,11 +15,16 @@ INCLUDEPATH += $$PWD/../include
 
 SOURCES += main.cpp\
     application.cpp \
-    commandline.cpp
+    commandline.cpp \
+    windowmanager.cpp \
+    browserwindow.cpp
 
 HEADERS  += \
     application.h \
-    commandline.h
+    commandline.h \
+    windowmanager.h \
+    browserwindow.h \
+    core/objectcore.h
 
 TRANSLATIONS = $$PWD/../lang/source/source_en.ts
 
@@ -37,3 +42,5 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../plug
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../plugins/singleapplication/release/singleapplication.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../plugins/singleapplication/debug/singleapplication.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../plugins/singleapplication/libsingleapplication.a
+
+DISTFILES +=

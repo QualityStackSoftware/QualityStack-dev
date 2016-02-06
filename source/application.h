@@ -3,6 +3,8 @@
 
 #include <global>
 
+#include "windowmanager.h"
+
 class Application : public QApplication
 {
     Q_OBJECT
@@ -15,7 +17,7 @@ public slots:
     void incomingMessage(QStringList msg);
 
 private:
-
+    WindowManager* m_windowManager;
 };
 
 #endif // APPLICATION_H

@@ -1,6 +1,7 @@
 ﻿#include "commandline.h"
 
-/*static*/ CommandLine::Status CommandLine::analyse(const QCoreApplication& app, QCommandLineParser& parser, QString& errorMessage)
+/*static*/ CommandLine::Status CommandLine::analyse(const QCoreApplication& coreApplication,
+                                                    QCommandLineParser& parser, QString& errorMessage)
 {
     /*
      * We setup expected options for our application
@@ -12,14 +13,18 @@
      * 5. Here, we do not quit application and we have valid options. So, we return ok.
      */
 
+    qDebug() << "Analyzing command line";
+
+
     // 1.
     parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsLongOptions);
     parser.setApplicationDescription("QualityDock description");
     QCommandLineOption versionOption = parser.addVersionOption();
-    QCommandLineOption helpOption  =parser.addHelpOption();
+    QCommandLineOption helpOption = parser.addHelpOption();
 
+    qDebug() << "arguments:" << coreApplication.arguments();
     // 2.
-    bool isParsedOk = parser.parse(app.arguments());
+    bool isParsedOk = parser.parse(coreApplication.arguments());
     isParsedOk &= (parser.unknownOptionNames().size() == 0);
 
     // 3.

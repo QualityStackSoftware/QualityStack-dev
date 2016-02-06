@@ -6,26 +6,31 @@
 
 int main(int argc, char *argv[])
 {
+    QString applicationName("QualityStack-dev");
+    QString applicationVersion("v1.0.0");
+
     Application app(argc, argv);
-    app.setApplicationName("QualityDock");
-    app.setApplicationVersion("v1.0.0");
+    app.setApplicationName(applicationName);
+    app.setApplicationVersion(applicationVersion);
 
     /*
      * Manage application unicity: we want to launch only one application (with possible several windows).
      *
      */
     SingleApplication single;
-    if (!single.init("QualityDock"))
+    if (!single.init(applicationName))
     {
-        return 1;
+        qDebug() << "failed to init unicity ssytem for application";
+        // return 1;
     }
 
     /*
-     * Manage commandLine in order to display help or version if necesserary.
+     * Manage commandLine in order to display help or version if needed.
      */
     QCommandLineParser parser;
     QString errorMessage = "";
     CommandLine::Status status = CommandLine::analyse(app, parser, errorMessage);
+    qDebug() << "status:"<< status << ", errorMessage:" << errorMessage;
     switch (status)
     {
         case CommandLine::Ok:
@@ -33,6 +38,7 @@ int main(int argc, char *argv[])
              * Arguments of application is ok.
              * So, we will continue to run this application.
              */
+            qDebug() << "Command line ok";
             break;
         case CommandLine::Error:
             /*
@@ -50,12 +56,14 @@ int main(int argc, char *argv[])
              */
             printf("%s %s\n", qPrintable(QCoreApplication::applicationName())
                    , qPrintable(QCoreApplication::applicationVersion()));
+            return 0;
         case CommandLine::HelpRequested:
             /*
              * Display help text for this application.
              * Then, we quit application without any error.
              */
             fprintf(stdout, "%s", qPrintable(parser.helpText()));
+            return 0;
     }
 
     //
@@ -68,6 +76,7 @@ int main(int argc, char *argv[])
      */
     if (single.alreadyExists())
     {
+        qDebug() << "Application is already running. So, sending arguments and quit";
         for (int i=0; i < argc; ++i)
         {
             single.send(QString(argv[i]));
@@ -75,22 +84,23 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    single.startListening();
+
     QObject::connect(&single
               ,SIGNAL(messageAvailable(QStringList))
               ,&app
               ,SLOT(incomingMessage(QStringList)));
 
 
-    // At this point, we have to initialise application
+    // At this point, there is no other application running.
+    // So, we have to to initialise application for the first time.
 
-    // afficher la page de
-    // - lancer authentification
-
+    //
 
     app.configure();
 
-
     QMainWindow w;
+    qDebug() << "Showing main window";
     w.show();
     return app.exec();
 }

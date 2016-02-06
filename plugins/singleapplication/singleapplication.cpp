@@ -1,13 +1,22 @@
 ﻿#include "singleapplication.h"
 
-#include <QTimer>
 #include <QDebug>
 
 SingleApplication::SingleApplication(QObject* parent)
     : QObject(parent)
     , bAlreadyExists(false)
+    , m_timer(new QTimer(this))
     , sharedMemory()
 {}
+
+SingleApplication::~SingleApplication()
+{
+    qDebug() << "Deleting single application system";
+    delete m_timer;
+    qDebug() << "Deleting single application system done";
+
+}
+
 
 
 bool SingleApplication::init(const QString& key)
@@ -17,26 +26,42 @@ bool SingleApplication::init(const QString& key)
     // we can create it only if it doesn't exist
     if (sharedMemory.create(5000))
     {
-        sharedMemory.lock();
+        bool isLock = sharedMemory.lock();
+        qDebug() << "Shared memory is created and locked";
         *(char*)sharedMemory.data() = '\0';
-        sharedMemory.unlock();
+        isLock = sharedMemory.unlock();
+        qDebug() << "Shared memory is assigned to zero ans unlocked";
         bAlreadyExists = false;
 
-        // start checking for messages of other instances.
-        QTimer* timer = new QTimer(this);
-        connect(timer, SIGNAL(timeout()), this, SLOT(checkForMessage()));
-        timer->start(200);
+        connect(m_timer, SIGNAL(timeout()), this, SLOT(checkForMessage()));
+
     }
     // it exits, so we can attach it ?!
     else if (sharedMemory.attach())
     {
+        qDebug() << "shared memory alredy exist for this application";
         bAlreadyExists = true;
     }
     else
     {
-        qDebug() << "Internal error";
+        qDebug() << "Internal error during creation of sharedmemory";
         return false;
     }
+    return true;
+}
+
+
+bool SingleApplication::startListening()
+{
+    // start checking for messages of other instances.
+    m_timer->start(1000);
+    return true;
+}
+
+
+bool SingleApplication::stoplistening()
+{
+    m_timer->stop();
     return true;
 }
 
@@ -54,6 +79,7 @@ bool SingleApplication::isMasterApp() const
 
 void SingleApplication::checkForMessage()
 {
+    qDebug() << "Check for message ...";
     QStringList arguments;
     sharedMemory.lock();
     char *from = (char*)sharedMemory.data();
@@ -72,6 +98,7 @@ void SingleApplication::checkForMessage()
     sharedMemory.unlock();
     if (arguments.size())
     {
+        qDebug() << "Message available:" << arguments;
         emit messageAvailable( arguments );
     }
 }

@@ -3,13 +3,15 @@
 
 #include <qglobal.h>
 
-#include <QApplication>
-#include <QObject>
-#include <QDebug>
-#include <QWindow>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
-#include <Qmap>
+#include <QCoreApplication>
+#include <QApplication>
 #include <QMainWindow>
+#include <QWindow>
+#include <QObject>
+#include <QDebug>
+#include <QMap>
+
 
 #endif // GLOBAL_H

@@ -3,6 +3,8 @@
 
 #include <QSharedMemory>
 #include <QStringList>
+#include <QTimer>
+
 
 class SingleApplication : public QObject
 {
@@ -10,7 +12,11 @@ class SingleApplication : public QObject
 public:
     SingleApplication(QObject* parent=0);
 
+    ~SingleApplication();
+
     bool init(const QString& key);
+    bool startListening();
+    bool stoplistening();
 
     bool alreadyExists() const;
     bool isMasterApp() const;
@@ -24,6 +30,7 @@ signals:
 
 private:
     bool bAlreadyExists;
+    QTimer* m_timer;
     QSharedMemory sharedMemory;
 };
 #endif // SINGLEAPPLICATION_H

@@ -15,7 +15,7 @@ public:
     };
 
     static Status analyse(
-            const QCoreApplication& app
+            const QCoreApplication& coreApplication
             , QCommandLineParser& parser
             , QString& errorMessage);
 
