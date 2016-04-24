@@ -1,7 +1,6 @@
 ﻿#include "commandline.h"
 
-/*static*/ CommandLine::Status CommandLine::analyse(const QCoreApplication& coreApplication,
-                                                    QCommandLineParser& parser, QString& errorMessage)
+/*static*/ CommandLine::Status CommandLine::analyse(QCommandLineParser& parser, QString& errorMessage)
 {
     /*
      * We setup expected options for our application
@@ -22,9 +21,11 @@
     QCommandLineOption versionOption = parser.addVersionOption();
     QCommandLineOption helpOption = parser.addHelpOption();
 
-    qDebug() << "arguments:" << coreApplication.arguments();
+    QStringList arguments = QCoreApplication::arguments();
+    qDebug() << "arguments:" << arguments;
+
     // 2.
-    bool isParsedOk = parser.parse(coreApplication.arguments());
+    bool isParsedOk = parser.parse(arguments);
     isParsedOk &= (parser.unknownOptionNames().size() == 0);
 
     // 3.

@@ -3,38 +3,26 @@
 
 #include <global>
 
+#include "core/messagetype.h"
+#include "core/objectcoremanager.h"
 #include "browserwindow.h"
-
-
 
 
 class WindowManager : public QObject
 {
     Q_OBJECT
-
 public:
+    explicit WindowManager(QObject* parent);
+    virtual ~WindowManager();
 
-    enum MessageType {
-        BrowserCount = 0,
-        CreateBrowser = 1,
-        DeleteBrowser = 2
-    };
-
-    explicit WindowManager(QObject *parent = 0);
-    ~WindowManager();
-
-
-
-signals:
-
-
-public slots:
-    void incomingMessage(MessageType type, QString option);
+    void init(ObjectCoreManager* manager);
 
 private:
-    QMap<QString, BrowserWindow* > m_browsers;
+    QWidget* createWindow(const QStringList& msg);
 
-    // add model here
+private:
+    ObjectCore* m_core;
+    QMap<QString, BrowserWindow* > m_browsers;
 
 };
 

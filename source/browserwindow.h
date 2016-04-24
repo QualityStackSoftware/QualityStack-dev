@@ -11,6 +11,8 @@ public:
     explicit BrowserWindow(QWidget *parent = 0);
     ~BrowserWindow();
 
+    void init(const QStringList& msg);
+
 signals:
 
 public slots:

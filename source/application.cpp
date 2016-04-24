@@ -1,30 +1,42 @@
 ﻿#include "application.h"
+#include "core/applicationobjectcore.h"
 
-Application::Application(int &argc, char **argv)
+Application::Application(int argc, char *argv[])
     : QApplication(argc, argv)
-    , m_windowManager(new WindowManager(this))
+    , m_objectCoreManager(new ObjectCoreManager)
+    , m_windowManager(new WindowManager)
 {
-    qDebug() << "Creating application";
 }
 
 Application::~Application()
 {
     qDebug() << "Deleting application";
+    delete m_objectCoreManager;
     delete m_windowManager;
     qDebug() << "Deleting application done";
 }
 
-
-void Application::incomingMessage(QStringList msg)
+void Application::init(ObjectCoreManager* manager)
 {
-    qDebug() << "Incoming message into application:" << msg;
+    qDebug() << "Configuring application";
+    Q_ASSUME(manager != 0);
 
+    m_windowManager->init(manager->get(ObjectType::WindowManager));
 
+    qDebug() << "Configuring application done";
 }
 
+///*virtual*/ void Application::do_receivingMessage(ObjectCore* from,
+//                                 ObjectCore* to,
+//                                 QJsonObject message)
+//{
+//    Q_ASSUME(from != 0);
+//    Q_ASSUME(to != 0);
+//    qDebug() << "receiving message" << from << to << message;
+//}
 
-void Application::configure()
-{
 
-}
-
+///*virtual*/ void do_receiveMe(QJsonObject message)
+//{
+//    qDebug() << "Receiving from me" << message;
+//}

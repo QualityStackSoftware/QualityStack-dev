@@ -17,14 +17,21 @@ SOURCES += main.cpp\
     application.cpp \
     commandline.cpp \
     windowmanager.cpp \
-    browserwindow.cpp
+    browserwindow.cpp \
+    core/objectcore.cpp \
+    core/applicationobjectcore.cpp \
+    core/objectcoremanager.cpp
 
 HEADERS  += \
     application.h \
     commandline.h \
     windowmanager.h \
     browserwindow.h \
-    core/objectcore.h
+    core/objectcore.h \
+    core/messagetype.h \
+    core/objecttype.h \
+    core/applicationobjectcore.h \
+    core/objectcoremanager.h
 
 TRANSLATIONS = $$PWD/../lang/source/source_en.ts
 
@@ -44,3 +51,6 @@ else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../plugins/singleapplication/libsingleapplication.a
 
 DISTFILES +=
+
+RESOURCES += \
+    source.qrc

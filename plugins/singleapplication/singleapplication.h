@@ -4,6 +4,7 @@
 #include <QSharedMemory>
 #include <QStringList>
 #include <QTimer>
+#include <QFile>
 
 
 class SingleApplication : public QObject
@@ -20,7 +21,7 @@ public:
 
     bool alreadyExists() const;
     bool isMasterApp() const;
-    bool send(const QString &message);
+    bool sendMessage(const QString &message);
 
 public slots:
     void checkForMessage();
@@ -29,6 +30,9 @@ signals:
     void messageAvailable(const QStringList& messages);
 
 private:
+    QFile file;
+    int cpt;
+
     bool bAlreadyExists;
     QTimer* m_timer;
     QSharedMemory sharedMemory;

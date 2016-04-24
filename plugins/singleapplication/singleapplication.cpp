@@ -1,13 +1,25 @@
 ﻿#include "singleapplication.h"
 
 #include <QDebug>
+#include <cstdio>
 
 SingleApplication::SingleApplication(QObject* parent)
     : QObject(parent)
     , bAlreadyExists(false)
     , m_timer(new QTimer(this))
     , sharedMemory()
-{}
+    , file("debug/in.txt")
+    , cpt(0)
+{
+
+    if (!file.open(QIODevice::ReadWrite | QIODevice::Text))
+    {
+        qDebug() << "failed to open file " << file.fileName();
+    }
+
+    qDebug() << "file is opened:" << file.isOpen();
+
+}
 
 SingleApplication::~SingleApplication()
 {
@@ -79,7 +91,16 @@ bool SingleApplication::isMasterApp() const
 
 void SingleApplication::checkForMessage()
 {
-    qDebug() << "Check for message ...";
+    qDebug() << "Check for message ... / file is opened: " << file.isOpen();
+
+
+    if (file.isOpen())
+    {
+        QTextStream out(&file);
+        out << "The magic number is: " << cpt++ << "\n";
+        qDebug() << "Writing into file";
+    }
+
     QStringList arguments;
     sharedMemory.lock();
     char *from = (char*)sharedMemory.data();
@@ -103,11 +124,11 @@ void SingleApplication::checkForMessage()
     }
 }
 
-bool SingleApplication::send(const QString &message)
+bool SingleApplication::sendMessage(const QString &message)
 {
-    //we cannot send mess if we are master process!
     if (isMasterApp())
     {
+        // We can not send message if we are the master process!
         return false;
     }
 

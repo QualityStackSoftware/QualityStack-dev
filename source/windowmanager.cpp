@@ -1,14 +1,10 @@
 ﻿#include "windowmanager.h"
 
 
-
-WindowManager::WindowManager(QObject *parent)
+WindowManager::WindowManager(QObject* parent)
     : QObject(parent)
-    , m_browsers()
+    , m_core(0)
 {
-    qDebug() << "Creating WindowManager";
-    qDebug() << "Creating WindowManager done";
-
 }
 
 WindowManager::~WindowManager()
@@ -18,30 +14,67 @@ WindowManager::~WindowManager()
 
 }
 
-
-void WindowManager::incomingMessage(MessageType type, QString option)
+void WindowManager::init(const ObjectCoreManager* manager)
 {
-    switch (type)
-    {
-    case BrowserCount: {
-        qDebug() << "emiting browserCount";
+    qDebug() << "Initializing window manager";
 
-        break;
-    }
-    case CreateBrowser:
-    {
-        qDebug() << "Creating new browser with option=" << option;
-        break;
-    }
-    case DeleteBrowser:
-    {
-        qDebug() << "Deleting browser with option=" << option;
-        break;
-    }
-    default:
-        qDebug() << "Internal error: Unmanaged request for windowManager";
-        break;
-
-    }
 }
+
+
+
+//void WindowManager::incomingMessage(MessageType type, QStringList option)
+//{
+//    switch (type)
+//    {
+//    case BrowserCount: {
+//        qDebug() << "emiting browserCount";
+//        createWindow(options);
+//        break;
+//    }
+//    case CreateBrowser:
+//    {
+//        qDebug() << "Creating new browser with option="
+//                 << option;
+
+//        break;
+//    }
+//    case DeleteBrowser:
+//    {
+//        qDebug() << "Deleting browser with option="
+//                 << option;
+//        break;
+//    }
+//    default:
+//        qDebug() << "Internal error: Unmanaged request for windowManager";
+//        break;
+
+//    }
+//}
+
+QWidget* WindowManager::createWindow(const QStringList& msg)
+{
+    QWidget* actWin = getCurrentWindow();
+
+    BrowserWindow* window = new BrowserWindow(this);
+    connect(window, SIGNAL(destroyed(QObject*)),
+            this, SLOT(windowDestroyed(QObject*)));
+    connect(window, SIGNAL(startingCompleted()),
+            this, SLOT(restoreOverrideCursor()));
+
+    m_browsers.insert(window->Identifier(), window);
+    qDebug() << "Create browser. # of browser is now" << m_browsers.size();
+
+
+    window->init(msg);
+
+
+    if (actWin != 0) {
+        window->setWindowState(actWin->windowState() & ~Qt::WindowMinimized);
+        window->raise();
+        window->activateWindow();
+        window->setFocus();
+    }
+
+}
+
 

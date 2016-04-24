@@ -7,11 +7,19 @@
 #include <QCommandLineOption>
 #include <QCoreApplication>
 #include <QApplication>
+#include <QSplashScreen>
+#include <QApplication>
 #include <QMainWindow>
 #include <QWindow>
+#include <QPixmap>
 #include <QObject>
 #include <QDebug>
+#include <QProcess>
+#include <QProcessEnvironment>
+#include <QSysInfo>
 #include <QMap>
+#include <QFile>
+#include <QJsonObject>
 
 
 #endif // GLOBAL_H

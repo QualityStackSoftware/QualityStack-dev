@@ -14,10 +14,7 @@ public:
         HelpRequested
     };
 
-    static Status analyse(
-            const QCoreApplication& coreApplication
-            , QCommandLineParser& parser
-            , QString& errorMessage);
+    static Status analyse(QCommandLineParser& parser, QString& errorMessage);
 
 private:
     QCommandLineParser m_parser;
