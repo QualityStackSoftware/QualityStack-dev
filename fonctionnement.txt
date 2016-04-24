@@ -190,8 +190,16 @@ widget fonctionnels
 - integration Jenkins
 	
 	
-	
+Stockage des données: 
+---------------------
 
+typeA/sha0.txt
+     /sha0/sha1.txt
+	      /typeB/sha2.txt
+                /sha3.txt
+		  /typeC/sha4.txt
+		         sha5.txt
+ 
 
 	
 	
