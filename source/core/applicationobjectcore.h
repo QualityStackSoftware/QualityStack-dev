@@ -7,7 +7,8 @@
 class ApplicationObjectCore : public ObjectCore
 {
 public:
-    ApplicationObjectCore(QObject* parent);
+    // TODO replace QObject by explicit Application ? NON
+    ApplicationObjectCore(QObject* parent = 0);
     ~ApplicationObjectCore();
 
     void init(ObjectCore* objectCore);

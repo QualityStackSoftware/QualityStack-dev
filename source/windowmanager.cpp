@@ -10,13 +10,17 @@ WindowManager::WindowManager(QObject* parent)
 WindowManager::~WindowManager()
 {
     qDebug() << "Deleting WindowManager";
+    // nothing to do with m_core
+    // TODO delete all window
     qDebug() << "Deleting WindowManager done";
-
 }
 
-void WindowManager::init(const ObjectCoreManager* manager)
+void WindowManager::init(const ObjectCoreManager& manager)
 {
     qDebug() << "Initializing window manager";
+    m_core =  manager.retreiveObjectCore(ObjectType::WindowManager);
+
+
 
 }
 
@@ -51,29 +55,24 @@ void WindowManager::init(const ObjectCoreManager* manager)
 //    }
 //}
 
-QWidget* WindowManager::createWindow(const QStringList& msg)
+QWidget* WindowManager::createWindow(const QString& id, const QStringList& msg, Qt::WindowStates state)
 {
-    QWidget* actWin = getCurrentWindow();
+    BrowserWindow* browser = new BrowserWindow;
+    connect(browser, SIGNAL(destroyed(QObject*)), this, SLOT(windowDestroyed(QObject*)));
+    connect(browser, SIGNAL(startingCompleted()), this, SLOT(restoreOverrideCursor()));
 
-    BrowserWindow* window = new BrowserWindow(this);
-    connect(window, SIGNAL(destroyed(QObject*)),
-            this, SLOT(windowDestroyed(QObject*)));
-    connect(window, SIGNAL(startingCompleted()),
-            this, SLOT(restoreOverrideCursor()));
-
-    m_browsers.insert(window->Identifier(), window);
+    m_browsers.insert(id, browser);
     qDebug() << "Create browser. # of browser is now" << m_browsers.size();
 
 
-    window->init(msg);
+    browser->init(id, msg);
 
-
-    if (actWin != 0) {
-        window->setWindowState(actWin->windowState() & ~Qt::WindowMinimized);
-        window->raise();
-        window->activateWindow();
-        window->setFocus();
-    }
+//    if (actWin != 0) {
+//        browser->setWindowState(state & ~Qt::WindowMinimized);
+//        browser->raise();
+//        browser->activateWindow();
+//        browser->setFocus();
+//    }
 
 }
 

@@ -1,29 +1,20 @@
 ﻿#include "commandline.h"
 #include "application.h"
 #include "core/objectcoremanager.h"
-#include <global>
+#include "core/windowmanagercore.h"
+#include "core/applicationobjectcore.h"
+
 #include <plugins/singleapplication>
+
+#include <global>
 
 
 int main(int argc, char *argv[])
 {
-    Application app(argv, argv);
-
-    app.setApplicationName("QualityStack-dev");
-    app.setApplicationVersion("v1.0.0");
+    Application app(argc, argv);
 
     /*
-     * Manage application unicity: we want to launch only one application (with possible several windows).
-     */
-    SingleApplication single;
-    if (!single.init(name))
-    {
-        qDebug() << "failed to init unicity system for application";
-        return 1;
-    }
-
-    /*
-     * Manage commandLine in order to display help or version if needed.
+     * Parse command line in order to display help or version if needed.
      */
     QCommandLineParser parser;
     QString errorMessage = "";
@@ -36,12 +27,6 @@ int main(int argc, char *argv[])
              * So, we will continue to run this application.
              */
             qDebug() << "Command line ok";
-
-
-            // TOD force name
-            // TODO force display name
-            // force version
-
             break;
         case CommandLine::Error:
             /*
@@ -69,6 +54,24 @@ int main(int argc, char *argv[])
             return 0;
     }
 
+    app.setApplicationPath( parser.value("path") );
+    app.setApplicationName( parser.value("name") );
+    app.setApplicationDisplayName( parser.value("displayName"));
+    app.setApplicationVersion("v1.0.0");
+
+
+    /*
+     * Manage application unicity: we want to launch only one application (with possible several windows).
+     */
+    SingleApplication single;
+    if (!single.init(app.applicationName()))
+    {
+        qDebug() << "failed to init unicity system for application";
+        return 1;
+    }
+
+
+
     /*
      * Here, command line is ok. We have to launch application if application is not already running.
      * If not, we send to existing application the command line in order to
@@ -95,28 +98,31 @@ int main(int argc, char *argv[])
 
     // shared model for each abstract item managed in this application ( requirement, test, ... )
 
-    // synchrisation system
+    // synchorisation system
 
     // system + GUI specific for specific activity
 
 
-    ObjectCoreManager* manager = new ObjectCoreManager;
-    manager->init();
 
-    app.init(manager);
+
+    ObjectCoreManager objectCoreManager;
+    objectCoreManager.insert(ObjectType::WindowManager, new WindowManagerCore);
+    objectCoreManager.insert(ObjectType::Application, new ApplicationObjectCore);
+
+
+
+    app.init(objectCoreManager);
 
 
     single.startListening();
-
-    QObject::connect(&single,
-                     SIGNAL(messageAvailable(QStringList)),
-                     &app,
-                     SLOT(incomingMessage(QStringList)));
+    QObject::connect(&single, SIGNAL(messageAvailable(QStringList)),
+                     &app, SLOT(incomingMessage(QStringList)));
 
 
-    QJsonObject json;
-    json.insert("Action", "NewWindow");
-    app.sendMe(json);
+
+    QJsonObject activity;
+    activity.insert("Action", "NewWindow");
+    app.sendMe(activity);
 
     return app.exec();
 }

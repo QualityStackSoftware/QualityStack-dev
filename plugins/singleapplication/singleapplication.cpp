@@ -5,19 +5,20 @@
 
 SingleApplication::SingleApplication(QObject* parent)
     : QObject(parent)
-    , bAlreadyExists(false)
+    , m_alreadyExist(false)
     , m_timer(new QTimer(this))
-    , sharedMemory()
-    , file("debug/in.txt")
+    , m_sharedMemory()
+    , m_file("debug/in.txt")
     , cpt(0)
 {
 
-    if (!file.open(QIODevice::ReadWrite | QIODevice::Text))
+    if (!m_file.open(QIODevice::ReadWrite | QIODevice::Text))
     {
-        qDebug() << "failed to open file " << file.fileName();
+        qDebug() << "failed to open file " << m_file.fileName();
     }
 
-    qDebug() << "file is opened:" << file.isOpen();
+    qDebug() << "file:" << m_file.fileName();
+    qDebug() << "file is opened:" << m_file.isOpen();
 
 }
 
@@ -33,26 +34,27 @@ SingleApplication::~SingleApplication()
 
 bool SingleApplication::init(const QString& key)
 {
-    sharedMemory.setKey(key);
+    qDebug() << "Creating shared memory with key=" << key;
+    m_sharedMemory.setKey(key);
 
     // we can create it only if it doesn't exist
-    if (sharedMemory.create(5000))
+    if (m_sharedMemory.create(5000))
     {
-        bool isLock = sharedMemory.lock();
+        bool isLock = m_sharedMemory.lock();
+        qDebug() << "Shared memoty is locked" << isLock;
         qDebug() << "Shared memory is created and locked";
-        *(char*)sharedMemory.data() = '\0';
-        isLock = sharedMemory.unlock();
-        qDebug() << "Shared memory is assigned to zero ans unlocked";
-        bAlreadyExists = false;
+        *(char*)m_sharedMemory.data() = '\0';
+        isLock = m_sharedMemory.unlock();
+        qDebug() << "Shared memory is assigned to zero and unlocked";
+        m_alreadyExist = false;
 
         connect(m_timer, SIGNAL(timeout()), this, SLOT(checkForMessage()));
-
     }
     // it exits, so we can attach it ?!
-    else if (sharedMemory.attach())
+    else if (m_sharedMemory.attach())
     {
-        qDebug() << "shared memory alredy exist for this application";
-        bAlreadyExists = true;
+        qDebug() << "shared memory already exist for this application";
+        m_alreadyExist = true;
     }
     else
     {
@@ -81,7 +83,7 @@ bool SingleApplication::stoplistening()
 
 bool SingleApplication::alreadyExists() const
 {
-    return bAlreadyExists;
+    return m_alreadyExist;
 }
 
 bool SingleApplication::isMasterApp() const
@@ -91,19 +93,35 @@ bool SingleApplication::isMasterApp() const
 
 void SingleApplication::checkForMessage()
 {
-    qDebug() << "Check for message ... / file is opened: " << file.isOpen();
+    qDebug() << "Check for message ... / file is opened: " << m_file.isOpen();
 
 
-    if (file.isOpen())
+    if (m_file.isOpen())
     {
-        QTextStream out(&file);
+        QTextStream out(&m_file);
         out << "The magic number is: " << cpt++ << "\n";
         qDebug() << "Writing into file";
     }
 
     QStringList arguments;
-    sharedMemory.lock();
-    char *from = (char*)sharedMemory.data();
+    bool isLocked = m_sharedMemory.lock();
+    qDebug() << "file is temporary locked" << isLocked;
+    char *from = (char*)m_sharedMemory.data();
+
+    qDebug() << m_sharedMemory.data();
+
+    qDebug() << from;
+
+    if(*from != '\0')
+    {
+        qDebug() << "there is something to read";
+    }
+    else
+    {
+        qDebug() << "there is nothing to read";
+    }
+
+
 
     while(*from != '\0')
     {
@@ -115,9 +133,10 @@ void SingleApplication::checkForMessage()
         arguments << QString::fromUtf8(byteArray.constData());
     }
 
-    *(char*)sharedMemory.data() = '\0';
-    sharedMemory.unlock();
-    if (arguments.size())
+    *(char*)m_sharedMemory.data() = '\0';
+
+    m_sharedMemory.unlock();
+    if (arguments.size() != 0)
     {
         qDebug() << "Message available:" << arguments;
         emit messageAvailable( arguments );
@@ -137,8 +156,8 @@ bool SingleApplication::sendMessage(const QString &message)
     byteArray.append(message.toUtf8());
     byteArray.append('\0');
 
-    sharedMemory.lock();
-    char *to = (char*)sharedMemory.data();
+    m_sharedMemory.lock();
+    char *to = (char*)m_sharedMemory.data();
     while (*to != '\0')
     {
         int sizeToRead = int(*to);
@@ -146,7 +165,7 @@ bool SingleApplication::sendMessage(const QString &message)
     }
 
     const char *from = byteArray.data();
-    memcpy(to, from, qMin(sharedMemory.size(), byteArray.size()));
-    sharedMemory.unlock();
+    memcpy(to, from, qMin(m_sharedMemory.size(), byteArray.size()));
+    m_sharedMemory.unlock();
     return true;
 }

@@ -30,11 +30,11 @@ signals:
     void messageAvailable(const QStringList& messages);
 
 private:
-    QFile file;
+    QFile m_file;
     int cpt;
 
-    bool bAlreadyExists;
+    bool m_alreadyExist;
     QTimer* m_timer;
-    QSharedMemory sharedMemory;
+    QSharedMemory m_sharedMemory;
 };
 #endif // SINGLEAPPLICATION_H

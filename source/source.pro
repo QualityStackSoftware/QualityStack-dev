@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     browserwindow.cpp \
     core/objectcore.cpp \
     core/applicationobjectcore.cpp \
-    core/objectcoremanager.cpp
+    core/objectcoremanager.cpp \
+    core/windowmanagercore.cpp
 
 HEADERS  += \
     application.h \
@@ -31,7 +32,8 @@ HEADERS  += \
     core/messagetype.h \
     core/objecttype.h \
     core/applicationobjectcore.h \
-    core/objectcoremanager.h
+    core/objectcoremanager.h \
+    core/windowmanagercore.h
 
 TRANSLATIONS = $$PWD/../lang/source/source_en.ts
 

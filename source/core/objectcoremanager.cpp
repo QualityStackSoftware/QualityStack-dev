@@ -4,7 +4,7 @@
 
 
 ObjectCoreManager::ObjectCoreManager(QObject *parent)
-    : QObject(parent)
+    : ObjectCore(ObjectType::ObjectCoreManager, parent)
     , m_objectCores()
 {
 }
@@ -15,19 +15,32 @@ ObjectCoreManager::~ObjectCoreManager()
 }
 
 
-ObjectCoreManager::init()
+void ObjectCoreManager::insert(ObjectType::ObjectType type, ObjectCore* objectToRegister)
 {
-    m_objectCores.insert(ObjectType::Application,
-                         new ApplicationObjectCore);
-
-
-
+    qDebug() << "Inserting type" << type << objectToRegister->getType();
+    m_objectCores.insert(type,  objectToRegister);
 }
 
 
-ObjectCore* ObjectCoreManager::get(ObjectType type) const
+ObjectCore* ObjectCoreManager::retreiveObjectCore(ObjectType::ObjectType type) const
 {
-    QMap<QString, ObjectCore*>::const_iterator i = m_objectCores.find(type);
+    QMap<ObjectType::ObjectType, ObjectCore*>::const_iterator i = m_objectCores.find(type);
     Q_ASSUME(i != m_objectCores.end());
     return i.value();
+}
+
+
+
+void ObjectCoreManager::do_receivingMessage(ObjectCore* from,
+                                 ObjectCore* to,
+                                 QJsonObject message)
+{
+    Q_UNUSED(from)
+    Q_UNUSED(to)
+    Q_UNUSED(message)
+}
+
+void ObjectCoreManager::do_receiveMe(QJsonObject message)
+{
+    Q_UNUSED(message)
 }

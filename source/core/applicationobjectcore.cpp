@@ -2,7 +2,7 @@
 #include "application.h"
 
 ApplicationObjectCore::ApplicationObjectCore(QObject* parent)
-    : ObjectCore(parent)
+    : ObjectCore(ObjectType::Application, parent)
 {
 
 }
@@ -19,12 +19,11 @@ void ApplicationObjectCore::init(ObjectCore* objectCore)
     QObject* parent  = objectCore->parent();
     Q_ASSUME(parent != 0);
 
-    Application* app = qobject_cast<Application*>(parent());
+    Application* app = qobject_cast<Application*>(parent);
     if (!app) {
         qDebug() << "null object for ApplicationObjectName";
         return;
     }
-
 
 }
 
@@ -39,5 +38,5 @@ void ApplicationObjectCore::init(ObjectCore* objectCore)
 
 /*virtual*/ void ApplicationObjectCore::do_receiveMe(QJsonObject message)
 {
-
+    Q_UNUSED(message);
 }

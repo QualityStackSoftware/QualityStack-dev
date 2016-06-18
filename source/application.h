@@ -4,11 +4,10 @@
 #include <global>
 
 #include "core/messagetype.h"
-#include "core/objectcore.h"
 #include "core/objectcoremanager.h"
 
-class WindowManager;
-class ObjectCoreManager;
+#include "windowmanager.h"
+
 
 class Application : public QApplication
 {
@@ -17,16 +16,22 @@ public:
     explicit Application(int argc, char *argv[]);
     ~Application();
 
-    void init(ObjectCoreManager* manager);
+    void setApplicationPath(const QString& applicationPath);
+    const QString& getApplicationPath() const;
+
+    void init(const ObjectCoreManager& manager);
+    void sendMe(const QJsonObject& json);
 
 public slots:
+    void incomingMessage(QStringList msg);
     void do_slots() {}
 
 private:
+    ObjectCore* m_applicationCore;
 
-    ObjectCoreManager* m_objectCoreManager;
-
-    WindowManager* m_windowManager;
+    QString m_applicationPath;
+    ObjectCoreManager m_objectCoreManager;
+    WindowManager m_windowManager;
 };
 
 #endif // APPLICATION_H

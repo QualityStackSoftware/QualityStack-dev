@@ -3,7 +3,8 @@
 #include <global>
 
 
-BrowserWindow::BrowserWindow(QWidget *parent) : QMainWindow(parent)
+BrowserWindow::BrowserWindow()
+    : QMainWindow()
 {
     qDebug() << "Creating Browser window";
 }
@@ -14,9 +15,13 @@ BrowserWindow::~BrowserWindow()
 }
 
 
-void BrowserWindow::init(const QStringList& msg)
+void BrowserWindow::init(const QString& id, const QStringList& msg)
 {
-    qDebug() << "Init browser";
+    qDebug() << "Init browser" << id;
+
+    m_id = id;
+    m_msg = msg;
+
 
     // do stuff here
 

@@ -12,13 +12,13 @@ class WindowManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit WindowManager(QObject* parent);
+    explicit WindowManager(QObject* parent = 0);
     virtual ~WindowManager();
 
-    void init(ObjectCoreManager* manager);
+    void init(const ObjectCoreManager& manager);
 
 private:
-    QWidget* createWindow(const QStringList& msg);
+    QWidget* createWindow(const QString& id, const QStringList& msg, Qt::WindowStates state);
 
 private:
     ObjectCore* m_core;

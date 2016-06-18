@@ -10,7 +10,7 @@ class ObjectCore : public QObject
     Q_OBJECT
 public:
 
-    ObjectCore(QObject* parent, ObjectType::ObjectType type);
+    ObjectCore(ObjectType::ObjectType type, QObject* parent =0);
     ~ObjectCore();
 
     ObjectType::ObjectType getType() const;

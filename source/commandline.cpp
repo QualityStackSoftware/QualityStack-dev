@@ -17,9 +17,17 @@
 
     // 1.
     parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsLongOptions);
-    parser.setApplicationDescription("QualityDock description");
+    parser.setApplicationDescription("QualityStack description");
     QCommandLineOption versionOption = parser.addVersionOption();
     QCommandLineOption helpOption = parser.addHelpOption();
+    QCommandLineOption pathApplicationOption(QStringList() << "p" << "path", "path used in  all application");
+    parser.addOption(pathApplicationOption);
+
+    QCommandLineOption nameOption(QStringList() << "n" << "name" << "application name");
+    parser.addOption(nameOption);
+
+    QCommandLineOption displayNameOption(QStringList() << "d" << "displayName" << "application display name");
+    parser.addOption(displayNameOption);
 
     QStringList arguments = QCoreApplication::arguments();
     qDebug() << "arguments:" << arguments;

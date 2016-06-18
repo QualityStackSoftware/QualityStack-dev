@@ -7,6 +7,7 @@ namespace ObjectType
 enum ObjectType
 {
     ModelManager = 0,
+    ObjectCoreManager,
     GitSystem,
     Synchronizer,
     WindowManager,

@@ -1,13 +1,13 @@
 ﻿#include "objectcore.h"
 
-ObjectCore::ObjectCore(QObject* parent, ObjectType::ObjectType type)
+ObjectCore::ObjectCore(ObjectType::ObjectType type, QObject* parent)
     : QObject(parent)
     , m_type(type)
 {
     connect(this, SIGNAL(receiveMessage(ObjectCore*,ObjectCore*,QJsonObject)),
             this, SLOT(receivingMessage(ObjectCore*,ObjectCore*,QJsonObject)));
 
-    connect(this, SIGNAL(sendMe(QJsonObject)), this, SLOT(receiveMe(QJsonObject));
+    connect(this, SIGNAL(sendMe(QJsonObject)), this, SLOT(receiveMe(QJsonObject)));
 }
 
 
@@ -25,27 +25,16 @@ ObjectType::ObjectType ObjectCore::getType() const
 void ObjectCore::registerListener(ObjectCore* object)
 {
     Q_ASSUME(object != 0);
-    connect(this,
-            SIGNAL(sendMessage(ObjectCore*,
-                               ObjectCore*,
-                               QJsonObject)),
-            object,
-            SIGNAL(receiveMessage(ObjectCore*,
-                                  ObjectCore*,
-                                  QJsonObject)));
+    connect(this, SIGNAL(sendMessage(ObjectCore*, ObjectCore*, QJsonObject)),
+            object, SIGNAL(receiveMessage(ObjectCore*, ObjectCore*, QJsonObject)));
 }
 
 
 void ObjectCore::unRegisterListener(ObjectCore* object)
 {
     Q_ASSUME(object != 0);
-    disconnect(this, SIGNAL(sendMessage(ObjectCore*,
-                                     ObjectCore*,
-                                     QJsonObject)),
-               object,
-               SIGNAL(receiveMessage(ObjectCore*,
-                                     ObjectCore*,
-                                     QJsonObject)));
+    disconnect(this, SIGNAL(sendMessage(ObjectCore*, ObjectCore*, QJsonObject)),
+               object, SIGNAL(receiveMessage(ObjectCore*, ObjectCore*, QJsonObject)));
 }
 
 
@@ -66,8 +55,8 @@ void ObjectCore::receivingMessage(ObjectCore* from, ObjectCore* to, QJsonObject 
     Q_ASSUME(from != 0);
     Q_ASSUME(to != 0);
 
-    // stupid
-    if (*to != *m_type){
+    if (to->getType() != m_type){
+        qDebug() << "do noting if type doesnt match";
         return;
     }
     return do_receivingMessage(from, to, message);
@@ -79,8 +68,6 @@ void ObjectCore::receiveMe(QJsonObject message)
     return do_receiveMe(message);
 }
 
-
-//
 
 bool operator!=(const ObjectCore& lhs, const ObjectCore& rhs)
 {
