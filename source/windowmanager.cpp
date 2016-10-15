@@ -57,6 +57,8 @@ void WindowManager::init(const ObjectCoreManager& manager)
 
 QWidget* WindowManager::createWindow(const QString& id, const QStringList& msg, Qt::WindowStates state)
 {
+    Q_UNUSED(state)
+
     BrowserWindow* browser = new BrowserWindow;
     connect(browser, SIGNAL(destroyed(QObject*)), this, SLOT(windowDestroyed(QObject*)));
     connect(browser, SIGNAL(startingCompleted()), this, SLOT(restoreOverrideCursor()));
@@ -73,6 +75,8 @@ QWidget* WindowManager::createWindow(const QString& id, const QStringList& msg, 
 //        browser->activateWindow();
 //        browser->setFocus();
 //    }
+
+    return browser;
 
 }
 
