@@ -2,27 +2,11 @@
 
 Application::Application(int argc, char *argv[])
     : QApplication(argc, argv)
+    , m_applicationCore()
     , m_applicationPath()
     , m_objectCoreManager()
     , m_windowManager()
-    , m_applicationCore()
 {    
-}
-
-Application::~Application()
-{
-    qDebug() << "Deleting application";
-    qDebug() << "Deleting application done";
-}
-
-void Application::setApplicationPath(const QString& applicationPath)
-{
-    m_applicationPath =  applicationPath;
-}
-
-const QString& Application::getApplicationPath() const
-{
-    return m_applicationPath;
 }
 
 

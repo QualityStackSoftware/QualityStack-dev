@@ -14,10 +14,12 @@ class Application : public QApplication
     Q_OBJECT
 public:
     explicit Application(int argc, char *argv[]);
-    ~Application();
+    ~Application()
+    {
+    }
 
-    void setApplicationPath(const QString& applicationPath);
-    const QString& getApplicationPath() const;
+    void setApplicationPath(const QString& path) { m_applicationPath = path; }
+    const QString& getApplicationPath() const { return m_applicationPath; }
 
     void init(const ObjectCoreManager& manager);
     void sendMe(const QJsonObject& json);
