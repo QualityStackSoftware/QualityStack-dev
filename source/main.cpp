@@ -54,14 +54,14 @@ int main(int argc, char *argv[])
             return 0;
     }
 
-    app.setApplicationPath( parser.value("path") );
-    app.setApplicationName( parser.value("name") );
-    app.setApplicationDisplayName( parser.value("displayName"));
+    app.setApplicationPath(parser.value("path"));
+    app.setApplicationName(parser.value("name"));
+    app.setApplicationDisplayName(parser.value("displayName"));
     app.setApplicationVersion("v1.0.0");
 
-
     /*
-     * Manage application unicity: we want to launch only one application (with possible several windows).
+     * Manage application unicity: we want to launch only one application
+     * (with possible several windows).
      */
     SingleApplication single;
     if (!single.init(app.applicationName()))
@@ -69,8 +69,6 @@ int main(int argc, char *argv[])
         qDebug() << "failed to init unicity system for application";
         return 1;
     }
-
-
 
     /*
      * Here, command line is ok. We have to launch application if application is not already running.
@@ -80,10 +78,13 @@ int main(int argc, char *argv[])
     if (single.alreadyExists())
     {
         qDebug() << "Application is already running. So, sending arguments and quit";
+
+        QStringList args;
         for (int i = 0; i < argc; ++i)
         {
-            single.sendMessage(QString(argv[i]));
+            args.push_back(QString(argv[i]));
         }
+        single.sendMessage(args.join(';'));
         return 0;
     }
 
