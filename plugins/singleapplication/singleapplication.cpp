@@ -157,7 +157,7 @@ bool SingleApplication::sendMessage(const QString &message)
     byteArray.append('\0');
 
     m_sharedMemory.lock();
-    char *to = (char*)m_sharedMemory.data();
+    char* to = (char*)m_sharedMemory.data();
     while (*to != '\0')
     {
         int sizeToRead = int(*to);
